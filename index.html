@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Noite do Medo - FNAF Style</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Courier New', Courier, monospace;
+      background: black;
+      color: white;
+      overflow: hidden;
+    }
+    #game {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      background: url('https://i.imgur.com/FZuS6P6.jpg') center/cover no-repeat;
+    }
+    .button {
+      position: absolute;
+      background: rgba(255, 0, 0, 0.6);
+      border: 2px solid white;
+      color: white;
+      font-weight: bold;
+      padding: 10px;
+      cursor: pointer;
+    }
+    #doorLeft { top: 80%; left: 5%; }
+    #doorRight { top: 80%; right: 5%; }
+    #cameraBtn { top: 5%; right: 5%; }
+    #status {
+      position: absolute;
+      top: 5%;
+      left: 5%;
+      font-size: 20px;
+    }
+    #jumpscare {
+      display: none;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: url('https://i.imgur.com/BZTjJPa.png') center/cover no-repeat;
+      z-index: 10;
+    }
+  </style>
+</head>
+<body>
+  <div id="game">
+    <div id="status">Hora: 12:00 | Energia: 100%</div>
+    <button id="doorLeft" class="button">Fechar Porta Esq.</button>
+    <button id="doorRight" class="button">Fechar Porta Dir.</button>
+    <button id="cameraBtn" class="button">Ver Câmeras</button>
+    <div id="jumpscare"></div>
+  </div>
+
+  <script>
+    let hour = 0;
+    let energy = 100;
+    let animatronicDistance = 0; // 0 = longe, 3 = chegou
+
+    const status = document.getElementById('status');
+    const jumpscare = document.getElementById('jumpscare');
+    const doorLeft = document.getElementById('doorLeft');
+    const doorRight = document.getElementById('doorRight');
+
+    let leftDoorClosed = false;
+    let rightDoorClosed = false;
+
+    doorLeft.onclick = () => {
+      leftDoorClosed = !leftDoorClosed;
+      doorLeft.textContent = leftDoorClosed ? "Abrir Porta Esq." : "Fechar Porta Esq.";
+    };
+
+    doorRight.onclick = () => {
+      rightDoorClosed = !rightDoorClosed;
+      doorRight.textContent = rightDoorClosed ? "Abrir Porta Dir." : "Fechar Porta Dir.";
+    };
+
+    function updateGame() {
+      hour += 1;
+      if (hour > 6) {
+        alert("Você sobreviveu até 6h! Parabéns!");
+        return;
+      }
+
+      // Reduz energia
+      energy -= 10;
+      if (energy <= 0) {
+        triggerJumpscare();
+        return;
+      }
+
+      // Animatronic se move
+      if (Math.random() < 0.5) {
+        animatronicDistance++;
+      }
+
+      // Se animatronic chegar
+      if (animatronicDistance >= 3) {
+        if (!leftDoorClosed && !rightDoorClosed) {
+          triggerJumpscare();
+          return;
+        } else {
+          animatronicDistance = 0; // Recuou por causa da porta
+        }
+      }
+
+      // Atualiza HUD
+      status.textContent = `Hora: ${hour}:00 | Energia: ${energy}%`;
+    }
+
+    function triggerJumpscare() {
+      jumpscare.style.display = 'block';
+      new Audio('https://www.myinstants.com/media/sounds/fnaf-screech.mp3').play();
+      setTimeout(() => {
+        alert("Você foi pego pelo animatrônico!");
+        location.reload();
+      }, 2000);
+    }
+
+    setInterval(updateGame, 6000); // cada hora = 6 segundos
+  </script>
+</body>
+</html>
